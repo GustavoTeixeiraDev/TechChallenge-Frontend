@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../services/api";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import Box from "@mui/material/Box";
-import Alert from "@mui/material/Alert";
+import { registerUser } from "../services/authApi"; // 🔄 NOVO
+import {
+  TextField,
+  Button,
+  Typography,
+  Container,
+  Box,
+  Alert
+} from "@mui/material";
 
 const RegisterPage = () => {
   const [username, setUsername] = useState("");
@@ -17,12 +19,14 @@ const RegisterPage = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(null);
     try {
-      const response = await api.post("/register", { username, password });
-      setSuccess(response.data.message);
+      const response = await registerUser({ username, password });
+      setSuccess(response.message || "Usuário registrado com sucesso!");
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
-      setError(err.response?.data?.message || "Erro ao registrar o usuário.");
+      setError(err.message || "Erro ao registrar o usuário.");
     }
   };
 
@@ -30,7 +34,7 @@ const RegisterPage = () => {
     <Container>
       <Box mt={5}>
         <Typography variant="h4" gutterBottom>
-          Register
+          Registrar
         </Typography>
         <form onSubmit={handleRegister}>
           {error && (
@@ -44,14 +48,14 @@ const RegisterPage = () => {
             </Box>
           )}
           <TextField
-            label="Username"
+            label="Usuário"
             fullWidth
             margin="normal"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
           <TextField
-            label="Password"
+            label="Senha"
             type="password"
             fullWidth
             margin="normal"
@@ -59,7 +63,7 @@ const RegisterPage = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
           <Button variant="contained" color="primary" type="submit">
-            Register
+            Registrar
           </Button>
         </form>
       </Box>

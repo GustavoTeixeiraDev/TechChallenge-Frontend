@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom"; // Certifique-se de importar corretamente
-import api from "../services/api";
+import { loginUser } from "../services/authApi";
 import { AuthContext } from "../context/AuthContext";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -19,13 +19,14 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post("/login", { username, password });
-      login(response.data.token);
-      navigate("/admin"); // Agora funciona corretamente
+      const response = await loginUser({ username, password });
+      login(response.token); // Armazena o token no contexto
+      navigate("/admin");
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed.");
+      setError(err.message || "Login failed.");
     }
   };
+
 
   return (
     <Container>

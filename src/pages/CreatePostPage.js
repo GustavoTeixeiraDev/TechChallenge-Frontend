@@ -1,25 +1,35 @@
-import { useState } from "react";
-import api from "../services/api";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import Box from "@mui/material/Box";
-import Modal from "@mui/material/Modal";
+import { useState, useContext } from "react";
+import { createPost } from "../services/postApi";
+import { AuthContext } from "../context/AuthContext";
+import {
+  TextField,
+  Button,
+  Typography,
+  Container,
+  Box,
+  Modal
+} from "@mui/material";
 
 const CreatePostPage = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [author, setAuthor] = useState("");
   const [open, setOpen] = useState(false);
+  const { token } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!token) {
+      alert("Você precisa estar logado para criar posts.");
+      return;
+    }
+
     try {
-      await api.post("/posts", { title, content, author });
+      await createPost({ title, content, author }, token);
       setOpen(true);
     } catch (err) {
       console.error(err);
+      alert("Erro ao criar post.");
     }
   };
 
@@ -38,14 +48,14 @@ const CreatePostPage = () => {
         </Typography>
         <form onSubmit={handleSubmit}>
           <TextField
-            label="Title"
+            label="Título"
             fullWidth
             margin="normal"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
           <TextField
-            label="Content"
+            label="Conteúdo"
             multiline
             rows={4}
             fullWidth
@@ -54,14 +64,14 @@ const CreatePostPage = () => {
             onChange={(e) => setContent(e.target.value)}
           />
           <TextField
-            label="Author"
+            label="Autor"
             fullWidth
             margin="normal"
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
           />
           <Button variant="contained" color="primary" type="submit">
-            Submit
+            Publicar
           </Button>
         </form>
       </Box>
@@ -83,16 +93,12 @@ const CreatePostPage = () => {
           <Typography variant="h6" gutterBottom>
             Post Criado!
           </Typography>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
+          <Typography variant="body2" color="text.secondary">
             Sua postagem foi criada com sucesso.
           </Typography>
           <Box mt={2} display="flex" justifyContent="flex-end">
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleClose}
-            >
-              Close
+            <Button variant="contained" color="primary" onClick={handleClose}>
+              Fechar
             </Button>
           </Box>
         </Box>

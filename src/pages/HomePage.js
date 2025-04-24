@@ -1,32 +1,32 @@
 import { useState, useEffect } from "react";
-import api from "../services/api";
-import Grid from "@mui/material/Grid";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardActions from "@mui/material/CardActions";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
+import { getAllPosts } from "../services/postApi";
+import {
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
+  Typography,
+  Button,
+  TextField,
+  Box,
+  Container
+} from "@mui/material";
 import { Link } from "react-router-dom";
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
 
 const HomePage = () => {
   const [posts, setPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Busca todos os posts na API
   useEffect(() => {
-    api.get("/posts")
-      .then((response) => {
-        setPosts(response.data);
-        setFilteredPosts(response.data);
+    getAllPosts()
+      .then((data) => {
+        setPosts(data);
+        setFilteredPosts(data);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error("Erro ao buscar posts:", err));
   }, []);
 
-  // Filtra os posts conforme o termo digitado
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
@@ -46,9 +46,8 @@ const HomePage = () => {
           Blog Posts
         </Typography>
 
-        {/* Campo de busca */}
         <TextField
-          label="Search posts"
+          label="Buscar posts"
           variant="outlined"
           fullWidth
           margin="normal"
@@ -56,7 +55,6 @@ const HomePage = () => {
           onChange={handleSearch}
         />
 
-        {/* Lista de posts */}
         <Grid container spacing={5}>
           {filteredPosts.map((post) => (
             <Grid item xs={12} sm={6} md={4} key={post._id}>
@@ -66,7 +64,7 @@ const HomePage = () => {
                     {post.title}
                   </Typography>
                   <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                    By {post.author}
+                    Por {post.author}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {post.content.substring(0, 100)}...
@@ -74,15 +72,20 @@ const HomePage = () => {
                 </CardContent>
                 <CardActions>
                   <Button size="small" component={Link} to={`/post/${post._id}`}>
-                    Read More
+                    Ler mais
                   </Button>
                 </CardActions>
               </Card>
             </Grid>
           ))}
           {filteredPosts.length === 0 && (
-            <Typography variant="body1" color="text.secondary" align="center" style={{ width: "100%", marginTop: "20px" }}>
-              No posts found.
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              align="center"
+              style={{ width: "100%", marginTop: "20px" }}
+            >
+              Nenhum post encontrado.
             </Typography>
           )}
         </Grid>
